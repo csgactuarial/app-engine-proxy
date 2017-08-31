@@ -3,7 +3,6 @@ var http  = require('http');
 var util  = require('util');
 var path  = require('path');
 var fs    = require('fs');
-var colors = require('colors');
 var url   = require('url');
 var httpProxy = require('http-proxy');
 
