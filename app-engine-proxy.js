@@ -16,10 +16,10 @@ var getHTTPSOptions = function() {
   return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
 }
 
-var getHTTPSOptions = function() {
-  return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
+var httpsOptions = {
+  key: fs.readFileSync(getHTTPSOptions().key),
+  cert: fs.readFileSync(getHTTPSOptions().cert)
 }
-
 var proxy = httpProxy.createProxyServer({});
 
 proxy.on('proxyReq', function (proxyReq, req, res) {
