@@ -16,10 +16,10 @@ var getHTTPSOptions = function() {
   return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
 }
 
-var httpsOptions = {
-  key: fs.readFileSync(getHTTPSOptions().key),
-  cert: fs.readFileSync(getHTTPSOptions().cert)
+var getHTTPSOptions = function() {
+  return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
 }
+
 var proxy = httpProxy.createProxyServer({});
 
 proxy.on('proxyReq', function (proxyReq, req, res) {
@@ -28,7 +28,13 @@ proxy.on('proxyReq', function (proxyReq, req, res) {
 proxy.on('proxyRes', function (proxyRes, req, res) {
 });
 
+// var server = http.createServer(function(req, res) {
 var server = https.createServer(httpsOptions, function(req, res) {
+  console.log(req.url);
+  if(req.url == '/health-check') {
+    return respond(200, '', res);
+  }
+
   if(!req.headers['x-target']) {
     return respond(400, 'required header "X-Target" not found', res);
   }
@@ -49,4 +55,5 @@ var server = https.createServer(httpsOptions, function(req, res) {
   });
 });
 
+// server.listen(8585);
 server.listen(443);
