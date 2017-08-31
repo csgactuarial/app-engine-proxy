@@ -6,6 +6,11 @@ var fs    = require('fs');
 var url   = require('url');
 var httpProxy = require('http-proxy');
 
+var httpsOpts = {
+  key: fs.readFileSync('/path/to/key.pem', 'utf8'),
+  cert: fs.readFileSync('/path/to/cert.pem', 'utf8')
+};
+
 var proxy = httpProxy.createProxyServer({});
 
 proxy.on('proxyReq', function (proxyReq, req, res) {
@@ -23,6 +28,7 @@ var server = http.createServer(function(req, res) {
   req.url = '';
 
   proxy.web(req, res, {
+    ssl: httpsOpts,
     target: target,
     agent: agent,
     headers: {
@@ -31,4 +37,4 @@ var server = http.createServer(function(req, res) {
   });
 });
 
-server.listen(80);
+server.listen(443);
