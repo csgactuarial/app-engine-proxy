@@ -1,6 +1,6 @@
 # App Engine Proxy
 
-**App Engine Proxy** is a Node.js proxy server that uses [node-http-proxy](https://github.com/nodejitsu/node-http-proxy) to modify and proxy URL Fetch requests.  This solution was inspired by integration with a third party that requires a dedicated IP for their firewall.
+**App Engine Proxy** is a Node.js proxy server that uses [node-http-proxy](https://github.com/nodejitsu/node-http-proxy) to modify and proxy URL Fetch requests.  This solution was inspired by an integration with a third party that requires a dedicated IP for their firewall.
 
 ### Install
 1) clone
