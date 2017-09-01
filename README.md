@@ -21,7 +21,7 @@ Host: proxy.example.com
 X-Target: https://csgapi.appspot.com/v1/med_supp/open/companies.json
 Cache-Control: no-cache
 ````
-The main thing to notice here is the addition of the "X-Target" header.  This is the URI you wish to reach.
+The main thing to notice here is the addition of the **"X-Target"** header.  This is the URI you wish to reach.
 
 #### CURL
 ````
