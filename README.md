@@ -35,7 +35,7 @@ headers = {
     'X-Target': url,
 }
 
-response = urlfetch.fetch('http://proxy.example.com', headers=headers)
+response = urlfetch.fetch('https://proxy.example.com', headers=headers)
 print(response.status_code)
 print(response.content)
 
