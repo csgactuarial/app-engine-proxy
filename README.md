@@ -27,7 +27,7 @@ curl https://csgapi.appspot.com/v1/med_supp/open/companies.json -x https://proxy
 ````
 #### Python (App Engine)
 ````
-url = 'http://api.ipify.org'
+url = 'https://csgapi.appspot.com/v1/med_supp/open/companies.json'
 
 headers = {
     'X-Target': url,
