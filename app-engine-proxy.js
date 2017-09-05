@@ -1,7 +1,3 @@
-var https = require('https');
-var http = require('http');
-var util = require('util');
-var path = require('path');
 var fs = require('fs');
 var url = require('url');
 var httpProxy = require('http-proxy');
@@ -30,13 +26,20 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 
 // var server = http.createServer(function(req, res) {
 var server = https.createServer(httpsOptions, function(req, res) {
-  console.log(req.url);
   if(req.url == '/health-check') {
     return respond(200, '', res);
   }
 
   if(!req.headers['x-target']) {
     return respond(400, 'required header "X-Target" not found', res);
+  }
+
+  if(req.headers['x-forwarded-for']) {
+    var xForwardedFor = req.headers['x-forwarded-for'].split(',');
+    if(xForwardedFor && xForwardedFor.length) {
+      // https://cloud.google.com/compute/docs/load-balancing/http/#target_proxies
+      req.headers['x-forwarded-for'] = xForwardedFor.pop();
+    }
   }
 
   var target = req.headers['x-target'];
