@@ -1,3 +1,4 @@
+var https = require('https');
 var fs = require('fs');
 var url = require('url');
 var httpProxy = require('http-proxy');
