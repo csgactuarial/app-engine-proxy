@@ -36,14 +36,6 @@ var server = https.createServer(httpsOptions, function(req, res) {
     return respond(400, 'required header "X-Target" not found', res);
   }
 
-  if(req.headers['x-forwarded-for']) {
-    var xForwardedFor = req.headers['x-forwarded-for'].split(',');
-    if(xForwardedFor && xForwardedFor.length) {
-      // https://cloud.google.com/compute/docs/load-balancing/http/#target_proxies
-      req.headers['x-forwarded-for'] = xForwardedFor.pop();
-    }
-  }
-
   var target = req.headers['x-target'];
   var proxyURL = url.parse(target);
   var host = proxyURL.host;
