@@ -16,7 +16,8 @@ var getHTTPSOptions = function() {
 
 var httpsOptions = {
   key: fs.readFileSync(getHTTPSOptions().key),
-  cert: fs.readFileSync(getHTTPSOptions().cert)
+  cert: fs.readFileSync(getHTTPSOptions().cert),
+  ca: fs.readFileSync(getHTTPSOptions().ca)
 }
 var proxy = httpProxy.createProxyServer({});
 

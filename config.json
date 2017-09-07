@@ -2,5 +2,6 @@
   "keyCert": {
     "key": "/path/to/key.pem",
     "cert": "/path/to/crt.pem"
+    "ca": "/path/to/ca.pem"
   }
 }
