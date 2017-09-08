@@ -25,7 +25,7 @@ The main thing to notice here is the addition of the **"X-Target"** header.  Thi
 
 #### CURL
 ````
-curl https://csgapi.appspot.com/v1/med_supp/open/companies.json -x https://proxy.example.com
+curl https://csgapi.appspot.com/v1/med_supp/open/companies.json -x https://proxy.example.com/
 ````
 #### Python (App Engine)
 ````
@@ -35,7 +35,7 @@ headers = {
     'X-Target': url,
 }
 
-response = urlfetch.fetch('https://proxy.example.com', headers=headers)
+response = urlfetch.fetch('https://proxy.example.com/', headers=headers)
 print(response.status_code)
 print(response.content)
 
