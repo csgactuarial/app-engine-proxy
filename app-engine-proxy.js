@@ -10,11 +10,33 @@ var httpsOptions = {
 }
 
 /**
+ * looks for a config.json file and builds the HTTPSOptions
+ * for client and server.
+ * {
+ *   "key": path to private key,
+ *   "cert": path to certificate,
+ *   "ca": path to certificate chain
+ * }
+ */
+function buildHTTPSOptionsFromFiles() {
+  var getHTTPSOptions = function() {
+    return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
+  }
+  
+  var httpsOptions = {
+    key: fs.readFileSync(getHTTPSOptions().key),
+    cert: fs.readFileSync(getHTTPSOptions().cert),
+    ca: fs.readFileSync(getHTTPSOptions().ca)
+  }
+}
+
+/**
  * Builds the HTTPS Options for server and cleint SSL
+ * Uses google cloud secret manager
  * 
  * @return {Promise[undefined, undefined, undefined]}
  */
-async function buildHTTPSOptions() {
+async function buildHTTPSOptionsFromSecretManager() {
   let p1 = secretManager.getProxyClientPrivateKey().then(key => { httpsOptions.key = key });
   let p2 = secretManager.getProxyClientCRT().then(cert => { httpsOptions.cert = cert });
   let p3 = secretManager.getProxyClientCA().then(ca => { httpsOptions.ca = [ca] });
