@@ -1,57 +1,66 @@
 var https = require('https');
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
+var URL = require('url').URL;
 var httpProxy = require('http-proxy');
-
-var respond = function(status, msg, res){
-  res.writeHead(status, {'content-type': 'text/plain'});
-  res.write(msg);
-  res.end();
-}
-
-var getHTTPSOptions = function() {
-  return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
-}
+var secretManager = require('./secret-manager');
 
 var httpsOptions = {
-  key: fs.readFileSync(getHTTPSOptions().key),
-  cert: fs.readFileSync(getHTTPSOptions().cert),
-  ca: fs.readFileSync(getHTTPSOptions().ca)
+  key: null,
+  cert: null,
+  ca: null
 }
-var proxy = httpProxy.createProxyServer({});
 
-proxy.on('proxyReq', function (proxyReq, req, res) {
-});
+/**
+ * Builds the HTTPS Options for server and cleint SSL
+ * 
+ * @return {Promise[undefined, undefined, undefined]}
+ */
+async function buildHTTPSOptions() {
+  let p1 = secretManager.getProxyClientPrivateKey().then(key => { httpsOptions.key = key });
+  let p2 = secretManager.getProxyClientCRT().then(cert => { httpsOptions.cert = cert });
+  let p3 = secretManager.getProxyClientCA().then(ca => { httpsOptions.ca = [ca] });
 
-proxy.on('proxyRes', function (proxyRes, req, res) {
-});
+  return Promise.all([p1, p2, p3]);
+}
 
-// var server = http.createServer(function(req, res) {
-var server = https.createServer(httpsOptions, function(req, res) {
-  if(req.url == '/health-check') {
-    return respond(200, '', res);
+/**
+ * Starts the proxy server, requires httpsOptions
+ */
+function startServer() {
+  var respond = function (status, msg, res) {
+    res.writeHead(status, { 'content-type': 'text/plain' });
+    res.write(msg);
+    res.end();
   }
 
-  if(!req.headers['x-target']) {
-    return respond(400, 'required header "X-Target" not found', res);
-  }
+  var proxy = httpProxy.createProxyServer({ ssl: httpsOptions });
 
-  var target = req.headers['x-target'];
-  var proxyURL = url.parse(target);
-  var host = proxyURL.host;
-  var protocol = proxyURL.protocol;
-  var agent = (protocol == 'https:' ? https.globalAgent:http.globalAgent);
-  req.url = '';
-
-  proxy.web(req, res, {
-    target: target,
-    agent: agent,
-    headers: {
-        host: host
+  var server = https.createServer(httpsOptions, function (req, res) {
+    if (req.url == '/health-check') {
+      return respond(200, '', res);
     }
-  });
-});
 
-// server.listen(8585);
-server.listen(443);
+    if (!req.headers['x-target']) {
+      return respond(400, 'required header "X-Target" not found', res);
+    }
+
+    var target = req.headers['x-target'];
+    var targetUrl = new URL(target);
+
+    // https://github.com/http-party/node-http-proxy/blob/master/lib/http-proxy/index.js#L65
+    // force client cert for client ssl cert authentication
+    if(req.headers['x-send-client-cert'] === 'true') {
+      targetUrl.key = httpsOptions.key;
+      targetUrl.cert = httpsOptions.cert;
+    }
+
+    proxy.web(req, res, {
+      target: targetUrl.href,
+      changeOrigin: true,
+    });
+
+  });
+
+  server.listen(443);
+}
+
+buildHTTPSOptions().then((values) => startServer());
