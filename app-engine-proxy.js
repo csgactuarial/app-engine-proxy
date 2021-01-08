@@ -15,7 +15,7 @@ var httpsOptions = {
  * {
  *   "key": path to private key,
  *   "cert": path to certificate,
- *   "ca": path to certificate chain
+ *   "ca": path to certificate authority chain
  * }
  */
 function buildHTTPSOptionsFromFiles() {
@@ -85,4 +85,4 @@ function startServer() {
   server.listen(443);
 }
 
-buildHTTPSOptions().then((values) => startServer());
+buildHTTPSOptionsFromSecretManager().then((values) => startServer());
