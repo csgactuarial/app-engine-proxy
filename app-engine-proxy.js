@@ -1,5 +1,5 @@
 var https = require('https');
-var URL = require('url').URL;
+var url = require('url');
 var httpProxy = require('http-proxy');
 var secretManager = require('./secret-manager');
 
@@ -66,7 +66,7 @@ function startServer() {
     }
 
     var target = req.headers['x-target'];
-    var targetUrl = new URL(target);
+    var targetUrl = url.parse(target);
 
     // https://github.com/http-party/node-http-proxy/blob/master/lib/http-proxy/index.js#L65
     // force client cert for client ssl cert authentication
@@ -76,7 +76,7 @@ function startServer() {
     }
 
     proxy.web(req, res, {
-      target: targetUrl.href,
+      target: targetUrl,
       changeOrigin: true,
     });
 
