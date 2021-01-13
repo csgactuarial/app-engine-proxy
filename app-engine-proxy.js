@@ -19,11 +19,13 @@ var httpsOptions = {
  * }
  */
 function buildHTTPSOptionsFromFiles() {
-  var getHTTPSOptions = function() {
+  var fs = require('fs');
+
+  var getHTTPSOptions = function () {
     return JSON.parse(fs.readFileSync('config.json', 'utf8')).keyCert;
   }
-  
-  var httpsOptions = {
+
+  httpsOptions = {
     key: fs.readFileSync(getHTTPSOptions().key),
     cert: fs.readFileSync(getHTTPSOptions().cert),
     ca: fs.readFileSync(getHTTPSOptions().ca)
@@ -70,14 +72,23 @@ function startServer() {
 
     // https://github.com/http-party/node-http-proxy/blob/master/lib/http-proxy/index.js#L65
     // force client cert for client ssl cert authentication
-    if(req.headers['x-send-client-cert'] === 'true') {
+    if (req.headers['x-send-client-cert'] === 'true') {
       targetUrl.key = httpsOptions.key;
       targetUrl.cert = httpsOptions.cert;
     }
 
+    var host = targetUrl.host;
+    var protocol = targetUrl.protocol;
+    var agent = (protocol == 'https:' ? https.globalAgent : http.globalAgent);
+    req.url = '';
+
     proxy.web(req, res, {
       target: targetUrl,
       changeOrigin: true,
+      agent: agent,
+      headers: {
+        host: host
+      }
     });
 
   });
